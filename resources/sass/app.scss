@@ -1,0 +1,24 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+//@import 'variables';
+
+// Fontawesome
+@import '~@fortawesome/fontawesome-free/scss/brands';
+@import '~@fortawesome/fontawesome-free/scss/regular';
+@import '~@fortawesome/fontawesome-free/scss/solid';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+
+// Bootstrap
+@import 'bootstrap';
+
+// Toastr
+@import '~toastr/build/toastr.min.css';
+
+// Custom
+@import 'custom';
+
+// Timeline
+@import '~summernote/dist/summernote-bs4.css';
+
