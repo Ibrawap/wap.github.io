@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use FFMpeg;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -13,7 +12,6 @@ class GenerateVideoThumbnail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $file;
     protected $video;
 
     /**
@@ -21,9 +19,8 @@ class GenerateVideoThumbnail implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($file, $video)
+    public function __construct($video)
     {
-        $this->file = $file;
         $this->video = $video;
     }
 
@@ -34,10 +31,11 @@ class GenerateVideoThumbnail implements ShouldQueue
      */
     public function handle()
     {
-        $path = "videos/{$this->file->basename}.png";
+        $name = \Str::slug($this->video->title, '_');
+        $path = "videos/{$name}.png";
 
-        FFMpeg::fromDisk('public')
-            ->open($this->file->path)
+        \FFMpeg::fromDisk('public')
+            ->open($this->video->path)
             ->getFrameFromSeconds(10)
             ->export()
             ->toDisk('public')
@@ -47,6 +45,6 @@ class GenerateVideoThumbnail implements ShouldQueue
             'thumbnail' => $path,
         ]);
 
-        FFMpeg::cleanupTemporaryFiles();
+        \FFMpeg::cleanupTemporaryFiles();
     }
 }

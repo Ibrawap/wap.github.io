@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreVideoRequest;
 use App\Video;
 use App\VideoCategory;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Traits\FileUploadTrait;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreVideoRequest;
 
 class VideoController extends Controller
 {
+    use FileUploadTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -44,19 +47,16 @@ class VideoController extends Controller
      */
     public function store(StoreVideoRequest $request)
     {
-        $file = $this->copyFileFromLinkAs(
-            $request->video_url, 'videos', $request->title
+        $data = $request->except('video_url');
+        $data['path'] = $this->remoteUploadFile(
+            $request->input('video_url'),
+            'videos',
+            $request->input('title')
         );
 
-        $video = auth()->user()->videos()->create([
-            'category_id' => $request->category_id,
-            'prefix'      => $request->prefix,
-            'title'       => $request->title,
-            'desc'        => $request->desc,
-            'path'        => $file->path,
-        ]);
+        $video = auth()->user()->videos()->create($data);
 
-        $this->dispatch(new \App\Jobs\GenerateVideoThumbnail($file, $video));
+        $this->dispatch(new \App\Jobs\GenerateVideoThumbnail($video));
 
         session()->flash('success', 'Video uploaded');
 
@@ -102,18 +102,18 @@ class VideoController extends Controller
      */
     public function update(Request $request, Video $video)
     {
-        $data = $request->only(['title', 'category_id', 'desc', 'prefix']);
+        $data = $request->except('video_url', 'files');
 
         if ($request->filled('video_url')) {
             Storage::delete([$video->path, $video->thumbnail]);
 
-            $file = $this->copyFileFromLinkAs(
-                $request->video_url, 'videos', $request->title
+            $data['path'] = $this->remoteUploadFile(
+                $request->input('video_url'),
+                'videos',
+                $request->input('title')
             );
 
-            $data['path'] = $file->path;
-
-            $this->dispatch(new \App\Jobs\GenerateVideoThumbnail($file, $video));
+            $this->dispatch(new \App\Jobs\GenerateVideoThumbnail($video));
         }
 
         $video->update($data);
@@ -139,20 +139,5 @@ class VideoController extends Controller
         session()->flash('success', 'Video deleted');
 
         return redirect(route('home'));
-    }
-
-    public function copyFileFromLinkAs($source, $folder, $name)
-    {
-        $extension = pathinfo($source, PATHINFO_EXTENSION) ?: 'mp4';
-        $basename  = Str::slug($name, '_');
-        $path      = "{$folder}/{$basename}.{$extension}";
-        $content   = file_get_contents($source);
-        Storage::disk('public')->put($path, $content);
-
-        return (object) [
-            'extension' => $extension,
-            'basename'  => $basename,
-            'path'      => $path,
-        ];
     }
 }
