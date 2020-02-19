@@ -31,7 +31,7 @@ class Album extends Model
 
     public function getTitleAttribute($value)
     {
-        return ucwords($this->artiste. ' - ' .$value);
+        return ucwords($value);
     }
 
 
