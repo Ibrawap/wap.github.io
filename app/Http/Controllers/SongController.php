@@ -71,6 +71,8 @@ class SongController extends Controller
 
         $song = auth()->user()->songs()->create($data);
 
+        $this->dispatchNow(new \App\Jobs\AddSongTags($song));
+
         session()->flash('success', 'Song uploaded');
 
         return redirect($song->permalink);
@@ -136,6 +138,8 @@ class SongController extends Controller
                 $request->input('title')
             );
         }
+
+        $this->dispatchNow(new \App\Jobs\AddSongTags($song));
 
         $song->update($validated);
 
