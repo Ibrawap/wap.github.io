@@ -140,4 +140,9 @@ class VideoController extends Controller
 
         return redirect(route('home'));
     }
+
+    public function download(Video $video)
+    {
+        return response()->download(Storage::path($video->path), basename($video->path));
+    }
 }

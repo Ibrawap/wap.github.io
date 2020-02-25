@@ -65,7 +65,7 @@ class Video extends Model
 
     public function getDownloadAttribute()
     {
-        return asset(Storage::url($this->path));
+        return route('videos.download', $this);
     }
 
     public function getPermalinkAttribute()

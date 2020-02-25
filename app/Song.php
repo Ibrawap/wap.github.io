@@ -98,7 +98,7 @@ class Song extends Model
 
     public function getDownloadAttribute()
     {
-        return asset(Storage::url($this->path));
+       return route('songs.download', $this);
     }
 
     public function getSizeAttribute()

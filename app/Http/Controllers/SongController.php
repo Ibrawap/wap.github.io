@@ -165,4 +165,9 @@ class SongController extends Controller
 
         return redirect(route('home'));
     }
+
+    public function download(Song $song)
+    {
+        return response()->download(Storage::path($song->path), basename($song->path));
+    }
 }
