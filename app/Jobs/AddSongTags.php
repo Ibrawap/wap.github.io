@@ -66,13 +66,9 @@ class AddSongTags implements ShouldQueue
 
         // write tags
         if (!$tagwriter->WriteTags()) {
-            session()->flash('error', "Failed to write tags for song ID ${$this->song->id}!");
-
-            \Log::error('warning', "Failed to write tags for song ID ${$this->song->id}!\r\n" . implode('\r\n', $tagwriter->errors));
+            \Log::error($tagwriter->errors);
         } elseif (!$tagwriter->WriteTags() && !empty($tagwriter->warnings)) {
-            session()->flash("There were some warnings for song ID ${$this->song->id}:\r\n");
-
-            \Log::warning("There were some warnings for song ID ${$this->song->id}:\r\n" . implode('\r\n', $tagwriter->warnings));
+            \Log::warning($tagwriter->warnings);
         } else {
             session()->flash('success', 'Tags written');
         }
