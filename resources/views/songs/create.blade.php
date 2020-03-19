@@ -99,7 +99,7 @@
                   <option value="">Choose...</option>
                   @foreach($albums as $album)
                   <option
-                    value="{{ $album->id }}">{{ $album->name }}
+                    value="{{ $album->id }}">{{ $album->title }}
                   </option>
                   @endforeach
                 </select>

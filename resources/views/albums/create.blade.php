@@ -88,7 +88,6 @@
             </div>
             
             <button type="submit" class="btn btn-primary btn-block">Save album</button>
-            {{ dd($errors) }}
           </form>
         </div>
       </div>

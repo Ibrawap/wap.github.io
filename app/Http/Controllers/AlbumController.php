@@ -6,11 +6,13 @@ use App\Album;
 use App\Artiste;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Traits\FileUploadTrait;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreAlbumRequest;
 
 class AlbumController extends Controller
 {
+    use FileUploadTrait;
     /**
      * Display a listing of the resource.
      *
@@ -41,16 +43,15 @@ class AlbumController extends Controller
      */
     public function store(StoreAlbumRequest $request)
     {
-        $file = $this->copyFileFromLinkAs($request->thumbnail_url, 'albums', $request->title);
+        $data = $request->except('thumbnail_url');
 
-        $album = auth()->user()->albums()->create([
-            'prefix' => $request->prefix,
-            'title' => $request->title,
-            'artiste' => $request->artiste,
-            'thumbnail' => $file->path,
-            'released_date' => $request->released_date,
-            'desc' => $request->desc
-        ]);
+        $data['thumbnail'] = $this->remoteUploadFile(
+            $request->input('thumbnail_url'),
+            'albums',
+            $request->input('title')
+        );
+
+        $album = auth()->user()->albums()->create($data);
     
         session()->flash('success', 'Album created');
 
@@ -65,7 +66,7 @@ class AlbumController extends Controller
      */
     public function show(Album $album)
     {
-        // $album->views()->create();
+        $album->views()->create();
         $related = Album::latest()->take(6)->get();
 
         return view('albums.show', compact('album', 'related'));
@@ -91,11 +92,23 @@ class AlbumController extends Controller
      */
     public function update(Request $request, Album $album)
     {
-        $album->update($request->all());
+        $data =  $request->except('thumbnail_url');
+
+        if ($request->filled('thumbnail_url')) {
+            Storage::delete($album->thumbnail);
+
+            $data['thumbnail'] = $this->remoteUploadFile(
+                $request->input('thumbnail_url'),
+                'albums',
+                $request->title
+            );
+        }
+
+        $album->update($data);
 
         session()->flash('success', 'album updated');
 
-        return redirect(route('albums.show', $album->id));
+        return redirect($album->permalink);
     }
 
     /**
@@ -114,20 +127,5 @@ class AlbumController extends Controller
         session()->flash('success', 'album deleted');
 
         return redirect(route('home'));
-    }
-
-   public function copyFileFromLinkAs($source, $folder, $name)
-    {
-        $extension = pathinfo($source, PATHINFO_EXTENSION) ?: 'mp4';
-        $basename  = Str::slug($name, '_');
-        $path      = "{$folder}/{$basename}.{$extension}";
-        $content   = file_get_contents($source);
-        Storage::disk('public')->put($path, $content);
-
-        return (object) [
-            'extension' => $extension,
-            'basename'  => $basename,
-            'path'      => $path,
-        ];
     }
 }

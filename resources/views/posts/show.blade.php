@@ -2,8 +2,8 @@
 @section('title', $post->title)
 @section('meta')
 @include('meta::manager', [
-  'title'       =>  $post->title,
-  'description' =>  Str::limit($post->desc, 100),
+  'title'       =>  "{{ $post->title }}",
+  'description' =>  "{{ Str::limit($post->desc, 100) }}",
   'image'       =>  $post->thumbnail_url,
 ])
 @endsection

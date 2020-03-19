@@ -60,12 +60,12 @@ class Video extends Model
     {
     	return (Storage::exists($this->thumbnail) )
             ? asset(Storage::url($this->thumbnail))
-            : asset("images/none.jpg");
+            : asset("images/none.png");
     }
 
     public function getDownloadAttribute()
     {
-        return asset(Storage::url($this->path));
+        return route('videos.download', $this);
     }
 
     public function getPermalinkAttribute()

@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
 use App\Post;
 use App\PostCategory;
 use Illuminate\Http\Request;
+use App\Traits\FileUploadTrait;
+use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UpdatePostRequest;
 
 class PostController extends Controller
 {
+    use FileUploadTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -50,13 +53,13 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        $validated = $request->validated();
+        $data = $request->validated();
 
         if ($request->has('thumbnail')) {
-            $validated['thumbnail'] = $request->file('thumbnail')->store('posts');
+            $data['thumbnail'] = $this->uploadFile($request->file('thumbnail'), 'posts');
         }
 
-        $post = auth()->user()->posts()->create($validated);
+        $post = auth()->user()->posts()->create($data);
 
         session()->flash('success', 'Post created');
 
@@ -105,14 +108,14 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
-        $validated = $request->validated();
+        $data = $request->validated();
 
         if ($request->has('thumbnail')) {
-            Storage::delete($post->thumbnail);
-            $validated['thumbnail'] = $request->file('thumbnail')->store('posts');
+            Storage::delete($post->thumbnail); //delete thumbnail to avoid duplication
+            $data['thumbnail'] = $this->uploadFile($request->file('thumbnail'), 'posts');
         }
 
-        $post->update($validated);
+        $post->update($data);
 
         session()->flash('success', 'Post Updated');
 

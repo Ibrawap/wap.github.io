@@ -26,6 +26,7 @@ Route::get('/songs/create', 'SongController@create')->name('songs.create')->midd
 Route::put('/songs/{song}', 'SongController@update')->name('songs.update')->middleware('auth');
 Route::get('/songs/{song}/edit', 'SongController@edit')->name('songs.edit')->middleware('auth');
 Route::delete('/songs/{song}', 'SongController@destroy')->name('songs.destroy')->middleware('auth');
+Route::get('/songs/download/{song}', 'SongController@download')->name('songs.download');
 Route::get('/songs/{song}/{slug}', 'SongController@show')->name('songs.show');
 
 Route::get('/albums', 'AlbumController@index')->name('albums.index');
@@ -42,6 +43,7 @@ Route::get('/videos/create', 'VideoController@create')->name('videos.create')->m
 Route::put('/videos/{video}', 'VideoController@update')->name('videos.update')->middleware('auth');
 Route::get('/videos/{video}/edit', 'VideoController@edit')->name('videos.edit')->middleware('auth');
 Route::delete('/videos/{video}', 'VideoController@destroy')->name('videos.destroy')->middleware('auth');
+Route::get('/videos/download/{video}', 'VideoController@download')->name('videos.download');
 Route::get('/videos/{video}/{slug}', 'VideoController@show')->name('videos.show');
 
 Route::middleware('auth')->group(function () {

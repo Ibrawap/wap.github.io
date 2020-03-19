@@ -15,6 +15,7 @@
         <div class="card-body">
           <form method="POST" action="{{ route('albums.update', $album) }}" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
             <label for="name">Prefix</label>
             <div class="form-group">
               <input
@@ -71,7 +72,7 @@
             <label for="released_date">Released date</label>
             <div class="form-group">
               <input
-              type="date"
+              type="text"
               name="released_date"
               class="form-control @error('released_date') is-invalid @enderror"
               value="{{ old('released_date') ?? $album->released_date }}"

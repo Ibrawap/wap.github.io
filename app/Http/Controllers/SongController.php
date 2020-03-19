@@ -6,15 +6,17 @@ use App\Album;
 use App\Artiste;
 use App\Http\Requests\StoreSongRequest;
 use App\Http\Requests\UpdateSongRequest;
-use App\Producer;
 use App\Song;
 use App\SongCategory;
+use App\Traits\FileUploadTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SongController extends Controller
 {
+    use FileUploadTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -43,7 +45,7 @@ class SongController extends Controller
         $categories = SongCategory::all();
         $albums     = Album::all();
 
-        return view('songs.create', compact('categories','albums'));
+        return view('songs.create', compact('categories', 'albums'));
     }
 
     /**
@@ -54,22 +56,22 @@ class SongController extends Controller
      */
     public function store(StoreSongRequest $request)
     {
-        $song = $this->copyFileFromLinkAs($request->song_url, 'songs', $request->title);
+        $data = $request->except('thumbnail_url', 'song_url');
+        $data['path'] = $this->remoteUploadFile(
+            $request->input('song_url'),
+            'songs',
+            $request->input('title')
+        );
+        
+        $data['thumbnail'] = $this->remoteUploadFile(
+            $request->input('thumbnail_url'),
+            'songs',
+            $request->input('title')
+        );
 
-        $thumbnail= $this->copyFileFromLinkAs($request->thumbnail_url, 'songs', $request->title);
+        $song = auth()->user()->songs()->create($data);
 
-        $song = auth()->user()->songs()->create([
-            'category_id' => $request->category_id,
-            'album_id'    => $request->album_id,
-            'title'       => $request->title,
-            'artiste'     => $request->artiste,
-            'featuring'   => $request->featuring,
-            'tags'        => $request->tags,
-            'prefix'      => $request->prefix,
-            'desc'        => $request->desc,
-            'thumbnail'   => $thumbnail->path,
-            'path'        => $song->path,
-        ]);
+        $this->dispatchNow(new \App\Jobs\AddSongTags($song));
 
         session()->flash('success', 'Song uploaded');
 
@@ -120,22 +122,24 @@ class SongController extends Controller
         if ($request->filled('thumbnail_url')) {
             Storage::delete($song->thumbnail);
 
-            $imported_img = $this->copyFileFromLinkAs(
-                $request->input('thumbnail_url'), 'songs', $request->input('title')
+            $validated['thumbnail'] = $this->remoteUploadFile(
+                $request->input('thumbnail_url'),
+                'songs',
+                $request->input('title')
             );
-
-            $validated['path'] = $imported_img->path;
         }
 
         if ($request->filled('song_url')) {
             Storage::delete($song->path);
-            
-            $imported_mp3 = $this->copyFileFromLinkAs(
-                $request->song_url, 'songs', $request->title
-            );
 
-            $validated['path'] = $imported_mp3->path;
+            $validated['path'] = $this->remoteUploadFile(
+                $request->input('song_url'),
+                'songs',
+                $request->input('title')
+            );
         }
+
+        $this->dispatchNow(new \App\Jobs\AddSongTags($song));
 
         $song->update($validated);
 
@@ -162,18 +166,8 @@ class SongController extends Controller
         return redirect(route('home'));
     }
 
-    public function copyFileFromLinkAs($source, $folder, $name)
+    public function download(Song $song)
     {
-        $extension = pathinfo($source, PATHINFO_EXTENSION) ?: 'mp3';
-        $basename  = Str::slug($name, '_');
-        $path      = "{$folder}/{$basename}.{$extension}";
-        $content   = file_get_contents($source);
-        Storage::put($path, $content);
-
-        return (object) [
-            'extension' => $extension,
-            'basename'  => $basename,
-            'path'      => $path,
-        ];
+        return response()->download(Storage::path($song->path), basename($song->path));
     }
 }
