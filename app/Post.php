@@ -60,7 +60,7 @@ class Post extends Model
     {
         return (Storage::exists($this->thumbnail) )
         	? asset(Storage::url($this->thumbnail))
-        	: asset("images/none.jpg");
+        	: asset("images/none.png");
         
     }
 
