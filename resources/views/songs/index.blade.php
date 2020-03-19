@@ -18,24 +18,25 @@
       <div class="row">
         @forelse($songs as $song)
         <div class="col-md-4">
-          <div class="card bd-rd-20">
-            <img class="card-img-top bd-rd-20" src="{{ $song->thumbnail_url }}" alt="">
-            <div class="card-img-overlay bd-rd-20 overlay-bg d-flex flex-column justify-content-center">
-              <h4 class="card-title"><a href="{{ $song->permalink }}" class="card-link stretched-link text-white">{{ $song->title }}</a></h4>
-              <div class="media">
-            <img
-            src="{{ $song->user->avatar }}"
-            width="30px"
-            height="30px"
-            class="img-thumbnail rounded-circle mr-1 mt-0"
-            >
-            <div class="media-body">
-              {{-- <h6 class="mt-0 text-primary">{{ $song->user->username }}</h6> --}}
-            </div>
-            <p class="text-mted">
-              <i class="fas fa-clock"></i> {{ $song->created_at->diffForHumans() }}
-            </p>
-          </div>
+          <div class="songs mb-4">
+            <div class="songs__image-wrapper">
+              <img class="songs__image" src="{{ $song->thumbnail_url }}" alt="">
+              <div class="songs__image-overlay">
+                <div class="songs__body">
+                  <h4 class="songs__title"><a href="{{ $song->permalink }}" class="songs__link stretched-link">Music: {{ $song->title }}</a></h4>
+                  <div class="songs__meta">
+                  <img
+                  src="{{ $song->user->avatar }}"
+                  width="30px"
+                  height="30px"
+                  class="img-thumbnail rounded-circle mr-1 mt-0"
+                  >
+                  <div class="text-mted">
+                    <i class="fas fa-clock"></i> {{ $song->created_at->diffForHumans() }}
+                  </div>
+                </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

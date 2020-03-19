@@ -18,11 +18,25 @@
       <div class="row">
         @forelse($albums as $album)
         <div class="col-md-4">
-          <div class="card bd-rd-20">
-            <img class="card-img-top bd-rd-20" src="{{ $album->thumbnail_url }}" alt="">
-            <div class="card-img-overlay bd-rd-20 overlay-bg d-flex flex-column justify-content-center">
-              <h4 class="card-title"><a href="{{ $album->permalink }}" class="card-link stretched-link text-white">{{ $album->title }}</a></h4>
-              <span class="badge badge-danger p-1">{{ $album->category->title ?? null}}</span>
+           <div class="songs mb-4">
+            <div class="songs__image-wrapper">
+              <img class="songs__image" src="{{ $album->thumbnail_url }}" alt="">
+              <div class="songs__image-overlay">
+                <div class="songs__body">
+                  <h4 class="songs__title"><a href="{{ $album->permalink }}" class="songs__link stretched-link">Music: {{ $album->title }}</a></h4>
+                  <div class="songs__meta">
+                  <img
+                  src="{{ $album->user->avatar }}"
+                  width="30px"
+                  height="30px"
+                  class="img-thumbnail rounded-circle mr-1 mt-0"
+                  >
+                  <div class="text-mted">
+                    <i class="fas fa-clock"></i> {{ $album->created_at->diffForHumans() }}
+                  </div>
+                </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

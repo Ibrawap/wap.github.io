@@ -18,36 +18,27 @@
     <div class="col-md-8">
       <div class="row">
         @forelse($videos as $video)
-        <div class="col-md-4">
-          <div class="card rounded-20 overflow-hidden">
-            <div class="position-relative">
-              <img
-              src="{{ $video->thumbnail_url }}"
-              class="card-img-top"
-              alt="{{ $video->title }}"
-              >
-              <div class="card-img-overlay overlay-bg">
-                <span class="badge badge-info p-1 rounded">{{ $video->category->title }}</span>
-              </div>
-            </div>
-            <div class="card-body">
-              <h5 class="card-title"><a href="{{ $video->permalink }}" class="card-link stretched-link">{{ $video->title }}</a></h5>
-              <div class="media">
-                <img
-                src="{{ $video->user->avatar }}"
-                width="30px"
-                height="30px"
-                class="img-thumbnail rounded-circle mr-1 mt-0"
-                >
-                <div class="media-body">
-                  {{-- <h5 class="mt-0 text-primary">{{ $video->user->username }}</h5> --}}
-                  
+        <div class="col-md-4 mb-4">
+          <div class="videos h-100">
+            <div class="videos__image-wrapper">
+                <img class="videos__image" src="{{ $video->thumbnail_url }}" alt="">
+                <div class="videos__image-overlay">
+                  <div class="videos__body">
+                    <h4><a href="{{ $video->permalink }}" class="videos__title stretched-link">Video: {{ $video->title }}</a></h4>
+                    <div class="videos__meta">
+                  <img
+                  src="{{ $video->user->avatar }}"
+                  width="30px"
+                  height="30px"
+                  class="img-thumbnail rounded-circle mr-1 mt-0"
+                  >
+                  <div class="text-mted">
+                    <i class="fas fa-clock"></i> {{ $video->created_at->diffForHumans() }}
+                  </div>
                 </div>
-                <p>
-                 <i class="fas fa-clock"></i> {{ $video->created_at->diffForHumans() }}
-                </p>
+                  </div>
+                </div>
               </div>
-            </div>
           </div>
         </div>
         @empty

@@ -17,33 +17,30 @@
     <div class="col-md-8">
       <div class="row">
         @forelse($posts as $post)
-        <div class="col-md-4">
-          <div class="card rounded-20 overflow-hidden">
-            <div class="position-relative">
+        <div class="col-md-4 mb-4">
+          <div class="posts">
+            <div class="posts__image-wrapper">
               <img
+              class="posts__image"
               src="{{ $post->thumbnail_url }}"
-              class="card-img-top"
-              alt="{{ $post->title }}"
-              style="border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; object-fit: cover;">
-              <div class="card-img-overlay overlay-bg">
-                <span class="badge badge-info p-1 rounded">{{ $post->category->title }}</span>
+              alt="{{ $post->title }}">
+              <div class="posts__image-overlay">
+                <div class="posts__label">{{ $post->category->title }}</div>
               </div>
             </div>
-            <div class="card-body">
-              <h5 class="card-title"><a href="{{ $post->permalink }}" class="card-link stretched-link">{{ $post->title }}</a></h5>
-              <div class="media">
+            <div class="posts__content">
+              <h5 class="posts__title"><a href="{{ $post->permalink }}" class="posts__link stretched-link">{{ $post->title }}</a></h5>
+              <div class="posts__meta">
                 <img
                 src="{{ $post->user->avatar }}"
                 width="30px"
                 height="30px"
                 class="img-thumbnail rounded-circle mr-1 mt-0"
                 >
-                <div class="media-body">
-                  {{-- <h6 class="mt-0 text-primary">{{ $post->user->username }}</h6> --}}
-                </div>
-                <p class="text-mted">
+          
+                <div class="text-muted">
                   <i class="fas fa-clock"></i> {{ $post->created_at->diffForHumans() }}
-                </p>
+                </div>
               </div>
               
             </div>
